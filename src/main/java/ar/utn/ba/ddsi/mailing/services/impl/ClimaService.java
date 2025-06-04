@@ -1,6 +1,8 @@
 package ar.utn.ba.ddsi.mailing.services.impl;
 
 import ar.utn.ba.ddsi.mailing.models.entities.Clima;
+import ar.utn.ba.ddsi.mailing.models.entities.Temperatura;
+import ar.utn.ba.ddsi.mailing.models.entities.Ubicacion;
 import ar.utn.ba.ddsi.mailing.models.repositories.IClimaRepository;
 import ar.utn.ba.ddsi.mailing.models.dto.external.weatherapi.WeatherResponse;
 import ar.utn.ba.ddsi.mailing.services.IClimaService;
@@ -41,7 +43,7 @@ public class ClimaService implements IClimaService {
             .flatMap(this::obtenerClimaDeAPI)
             .flatMap(clima -> {
                 climaRepository.save(clima);
-                logger.info("Clima actualizado para: {}", clima.getCiudad());
+                logger.info("Clima actualizado para: {}", clima.getUbicacion().getCiudad());
                 return Mono.empty();
             })
             .onErrorResume(e -> {
@@ -63,11 +65,8 @@ public class ClimaService implements IClimaService {
             .bodyToMono(WeatherResponse.class)
             .map(response -> {
                 Clima clima = new Clima();
-                clima.setCiudad(ciudad);
-                clima.setRegion(response.getLocation().getRegion());
-                clima.setPais(response.getLocation().getCountry());
-                clima.setTemperaturaCelsius(response.getCurrent().getTemp_c());
-                clima.setTemperaturaFahrenheit(response.getCurrent().getTemp_f());
+                clima.setUbicacion(new Ubicacion(ciudad,response.getLocation().getRegion(),response.getLocation().getCountry()));
+                clima.setTemperatura(new Temperatura(response.getCurrent().getTemp_c()));
                 clima.setCondicion(response.getCurrent().getCondition().getText());
                 clima.setVelocidadVientoKmh(response.getCurrent().getWind_kph());
                 clima.setHumedad(response.getCurrent().getHumidity());

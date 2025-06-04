@@ -8,11 +8,8 @@ import java.time.LocalDateTime;
 @Setter
 public class Clima {
     private Long id;
-    private String ciudad;
-    private String region;
-    private String pais;
-    private Double temperaturaCelsius;
-    private Double temperaturaFahrenheit;
+    private Ubicacion ubicacion;
+    private Temperatura temperatura;
     private String condicion;
     private Double velocidadVientoKmh;
     private Integer humedad;

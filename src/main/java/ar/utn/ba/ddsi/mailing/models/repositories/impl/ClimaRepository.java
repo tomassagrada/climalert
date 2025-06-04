@@ -18,10 +18,10 @@ public class ClimaRepository implements IClimaRepository {
             Long id = idGenerator.getAndIncrement();
             clima.setId(id);
             climas.put(id, clima);
-            ciudadToId.put(clima.getCiudad(), id);
+            ciudadToId.put(clima.getUbicacion().getCiudad(), id);
         } else {
             climas.put(clima.getId(), clima);
-            ciudadToId.put(clima.getCiudad(), clima.getId());
+            ciudadToId.put(clima.getUbicacion().getCiudad(), clima.getId());
         }
         return clima;
     }
@@ -53,7 +53,7 @@ public class ClimaRepository implements IClimaRepository {
     public void delete(Clima clima) {
         if (clima.getId() != null) {
             climas.remove(clima.getId());
-            ciudadToId.remove(clima.getCiudad());
+            ciudadToId.remove(clima.getUbicacion().getCiudad());
         }
     }
 } 

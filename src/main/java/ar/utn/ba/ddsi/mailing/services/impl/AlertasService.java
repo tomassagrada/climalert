@@ -1,5 +1,7 @@
 package ar.utn.ba.ddsi.mailing.services.impl;
 
+import ar.utn.ba.ddsi.mailing.config.AlertasConfig;
+import ar.utn.ba.ddsi.mailing.models.dtos.EmailInputDto;
 import ar.utn.ba.ddsi.mailing.models.entities.Clima;
 import ar.utn.ba.ddsi.mailing.models.entities.Email;
 import ar.utn.ba.ddsi.mailing.models.repositories.IClimaRepository;
@@ -14,9 +16,8 @@ import java.util.List;
 
 @Service
 public class AlertasService implements IAlertasService {
+    private AlertasConfig alertasConfig;
     private static final Logger logger = LoggerFactory.getLogger(AlertasService.class);
-    private static final double TEMPERATURA_ALERTA = 35.0;
-    private static final int HUMEDAD_ALERTA = 60;
 
     private final IClimaRepository climaRepository;
     private final EmailService emailService;
@@ -26,10 +27,14 @@ public class AlertasService implements IAlertasService {
     public AlertasService(
             IClimaRepository climaRepository, 
             EmailService emailService,
+            AlertasConfig alertasConfig,
+            @Value("${alertas.clima.temperatura}") double TEMPERATURA_ALERTA,
+            @Value("${alertas.clima.humedad}") int HUMEDAD_ALERTA,
             @Value("${email.alertas.remitente}") String remitente,
             @Value("${email.alertas.destinatarios}") String destinatarios) {
         this.climaRepository = climaRepository;
         this.emailService = emailService;
+        this.alertasConfig = alertasConfig;
         this.remitente = remitente;
         this.destinatarios = Arrays.asList(destinatarios.split(","));
     }
@@ -62,9 +67,8 @@ public class AlertasService implements IAlertasService {
     }
 
     private boolean cumpleCondicionesAlerta(Clima clima) {
-        //TODO: podríamos refactorizar el diseño para que no sea un simple método, pues puede ser más complejo
-        return clima.getTemperaturaCelsius() > TEMPERATURA_ALERTA && 
-               clima.getHumedad() > HUMEDAD_ALERTA;
+        return clima.getTemperatura().getTemperaturaCelsius() > alertasConfig.getTemperaturaAlerta() &&
+               clima.getHumedad() > alertasConfig.getHumedadAlerta();
     }
 
     private void generarYEnviarEmail(Clima clima) {
@@ -76,19 +80,19 @@ public class AlertasService implements IAlertasService {
             "Condición: %s\n" +
             "Velocidad del viento: %.1f km/h\n\n" +
             "Se recomienda tomar precauciones.",
-            clima.getCiudad(),
-            clima.getTemperaturaCelsius(),
+            clima.getUbicacion().getCiudad(),
+            clima.getTemperatura().getTemperaturaCelsius(),
             clima.getHumedad(),
             clima.getCondicion(),
             clima.getVelocidadVientoKmh()
         );
 
         for (String destinatario : destinatarios) {
-            Email email = new Email(destinatario, remitente, asunto, mensaje);
+            EmailInputDto email = new EmailInputDto(destinatario, remitente, asunto, mensaje);
             emailService.crearEmail(email);
         }
         
         logger.info("Email de alerta generado para {} - Enviado a {} destinatarios", 
-            clima.getCiudad(), destinatarios.size());
+            clima.getUbicacion().getCiudad(), destinatarios.size());
     }
 } 

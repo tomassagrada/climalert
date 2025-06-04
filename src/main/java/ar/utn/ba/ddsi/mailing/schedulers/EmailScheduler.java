@@ -1,6 +1,9 @@
 package ar.utn.ba.ddsi.mailing.schedulers;
 
+import ar.utn.ba.ddsi.mailing.config.SchedulingConfig;
 import ar.utn.ba.ddsi.mailing.services.IEmailService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

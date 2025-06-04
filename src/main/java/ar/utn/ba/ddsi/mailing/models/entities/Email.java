@@ -20,8 +20,4 @@ public class Email {
         this.contenido = contenido;
         this.enviado = false;
     }
-
-    public void enviar() {
-        //TODO: Implementación pendiente. Podríamos usar adapters
-    }
 } 

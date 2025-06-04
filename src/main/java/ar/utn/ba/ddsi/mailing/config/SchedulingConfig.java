@@ -1,5 +1,6 @@
 package ar.utn.ba.ddsi.mailing.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
@@ -8,6 +9,8 @@ import java.util.concurrent.Executors;
 
 @Configuration
 public class SchedulingConfig implements SchedulingConfigurer {
+    @Value("${scheduling.hilos}")
+    int cantidadHilos;
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
@@ -15,6 +18,6 @@ public class SchedulingConfig implements SchedulingConfigurer {
     }
 
     private Executor taskExecutor() {
-        return Executors.newScheduledThreadPool(3); // Pool de 3 hilos para nuestras tareas
+        return Executors.newScheduledThreadPool(cantidadHilos); // Pool de 3 hilos para nuestras tareas
     }
 } 
